@@ -1,3 +1,10 @@
+openssl (0.9.8g-15+lenny5) stable-security; urgency=low
+
+  * Don't check self signed certificate signatures in X509_verify_cert()
+    (Closes: #541735)
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Fri, 11 Sep 2009 17:00:05 +0200
+
 openssl (0.9.8g-15+lenny4) stable-security; urgency=low
 
   * Remove MD2 from digest algorithm table.  (CVE-2009-2409) (Closes: #539899)
