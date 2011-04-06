@@ -27,3 +27,14 @@ Architecture: any
 Depends: libssl0.9.8 (= ${binary:Version}), ${misc:Depends}
 Description: Symbol tables for libssl and libcrypto
  This package is part of the OpenSSL implementation of SSL.
+
+Package: libcrypto0.9.8-udeb
+XC-Package-Type: udeb
+Section: debian-installer
+Priority: optional
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: crypto shared library - udeb
+ libcrypto shared library.
+ .
+ Do not install it on a normal system.

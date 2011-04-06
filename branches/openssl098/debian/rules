@@ -120,6 +120,7 @@ binary-arch:	build
 #	mv debian/tmp/usr/lib/*.so.*.*.* debian/libssl09/usr/lib/
 #	mv debian/tmp/usr/lib/*.la debian/libssl09-dev/usr/lib/
 #	mv debian/tmp/usr/include debian/libssl09-dev/usr/
+	cp -pf debian/tmp/usr/lib/libcrypto.so.* debian/libcrypto0.9.8-udeb/usr/lib/
 	cp -auv lib*.so* debian/tmp/usr/lib/
 #	cp -auv lib*.a debian/tmp/usr/lib/
 	for opt in $(OPTS); do set -xe; mkdir -p debian/tmp/usr/lib/$$opt; cp -auv $$opt/lib*.so* debian/tmp/usr/lib/$$opt/; done
@@ -146,7 +147,7 @@ binary-arch:	build
 	dh_fixperms
 	dh_perl -d
 #	dh_suidregister
-	dh_makeshlibs -V "libssl0.9.8 (>= 0.9.8m-1)"
+	dh_makeshlibs -V "libssl0.9.8 (>= 0.9.8m-1)" --add-udeb="libcrypto0.9.8-udeb"
 	dh_shlibdeps -L libssl0.9.8 -l debian/libssl0.9.8/usr/lib
 	dh_gencontrol
 	dh_installdeb

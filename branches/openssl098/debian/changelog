@@ -1,3 +1,9 @@
+openssl098 (0.9.8o-7) unstable; urgency=low
+
+  * Re-add libcrypto0.9.8-udeb for easier transition.
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Wed, 06 Apr 2011 18:52:47 +0200
+
 openssl098 (0.9.8o-6) unstable; urgency=low
 
   * Upload as transitional openssl098 source package, just keeping
