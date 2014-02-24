@@ -1,0 +1,51 @@
+From: Thorsten Glaser <tg@mirbsd.de>
+Date: Fri, 22 May 2009 16:28:05 +0000 (UTC)
+Subject: Document openssl dgst -hmac option
+
+I've committed the thing below in MirBSD; since the apps code
+changes very little between OpenSSL versions, it will probably
+apply to the Debian package as well. I'm open for better wor-
+ding though, especially considering the FIPS option, which I
+found as undocumented too.
+
+Index: openssl-1.0.2~beta1/doc/apps/dgst.pod
+===================================================================
+--- openssl-1.0.2~beta1.orig/doc/apps/dgst.pod	2014-02-25 00:15:34.364841692 +0100
++++ openssl-1.0.2~beta1/doc/apps/dgst.pod	2014-02-25 00:15:34.360841777 +0100
+@@ -12,6 +12,8 @@
+ [B<-d>]
+ [B<-hex>]
+ [B<-binary>]
++[B<-hmac arg>]
++[B<-non-fips-allow>]
+ [B<-out filename>]
+ [B<-sign filename>]
+ [B<-keyform arg>]
+@@ -54,6 +56,14 @@
+ 
+ output the digest or signature in binary form.
+ 
++=item B<-hmac arg>
++
++set the HMAC key to "arg".
++
++=item B<-non-fips-allow>
++
++allow use of non FIPS digest.
++
+ =item B<-out filename>
+ 
+ filename to output to, or standard output by default.
+Index: openssl-1.0.2~beta1/apps/dgst.c
+===================================================================
+--- openssl-1.0.2~beta1.orig/apps/dgst.c	2014-02-25 00:15:34.364841692 +0100
++++ openssl-1.0.2~beta1/apps/dgst.c	2014-02-25 00:15:34.360841777 +0100
+@@ -276,6 +276,8 @@
+ 		BIO_printf(bio_err,"-d              to output debug info\n");
+ 		BIO_printf(bio_err,"-hex            output as hex dump\n");
+ 		BIO_printf(bio_err,"-binary         output in binary form\n");
++		BIO_printf(bio_err,"-hmac arg       set the HMAC key to arg\n");
++		BIO_printf(bio_err,"-non-fips-allow allow use of non FIPS digest\n");
+ 		BIO_printf(bio_err,"-sign   file    sign digest using private key in file\n");
+ 		BIO_printf(bio_err,"-verify file    verify a signature using public key in file\n");
+ 		BIO_printf(bio_err,"-prverify file  verify a signature using private key in file\n");
