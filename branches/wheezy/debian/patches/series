@@ -47,3 +47,4 @@ CVE-2010-5298.patch
 CVE-2014-XXXX-Extension-checking-fixes.patch
 CVE-2014-0076.patch
 ECDHE-ECDSA_Safari.patch
+CVE-2014-0198.patch

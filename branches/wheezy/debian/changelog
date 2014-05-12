@@ -1,3 +1,9 @@
+openssl (1.0.1e-2+deb7u9) wheezy-security; urgency=medium
+
+  * Fix CVE-2014-0198 (Closes: #747432)
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Mon, 12 May 2014 22:10:41 +0200
+
 openssl (1.0.1e-2+deb7u8) wheezy; urgency=medium
 
   * Don't prefer ECDHE_ECDSA with some Safari versions
