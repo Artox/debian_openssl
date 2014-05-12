@@ -1,3 +1,12 @@
+openssl (1.0.1e-2+deb7u8) wheezy; urgency=medium
+
+  * Don't prefer ECDHE_ECDSA with some Safari versions
+    This also adds the SSL_OP_SAFARI_ECDHE_ECDSA_BUG option.
+  * Actually restart the services when restart-without-asking is set.
+    (Closes: #745801)
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Thu, 01 May 2014 15:06:05 +0200
+
 openssl (1.0.1e-2+deb7u7) wheezy-security; urgency=high
 
   * Non-maintainer upload by the Security Team.
