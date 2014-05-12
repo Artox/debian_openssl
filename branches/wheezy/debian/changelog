@@ -1,3 +1,42 @@
+openssl (1.0.1e-2+deb7u7) wheezy-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Fix CVE-2010-5298: use-after-free race condition.
+  * Add a versioned dependency from openssl to libssl1.0.0 to a version
+    that has the fix for CVE-2014-0160 (Closes: #744194).
+  * Propose restarting prosody on upgrade (Closes: #744871).
+  * Correctly detect apache2 installations and propose it to be
+    restarted (Closes: #744141).
+  * Add more services to be checked for restart.
+  * Fix a bug where the critical flag for TSA extended key usage is not
+    always detected, and two other similar cases.
+  * Add support for 'libraries/restart-without-asking', which allows
+    services to be restarted automatically without prompting, or
+    requiring a response instead.
+  * Fix CVE-2014-0076: "Yarom/Benger FLUSH+RELOAD Cache Side-channel Attack"
+    (Closes: #742923).
+
+ -- Raphael Geissert <geissert@debian.org>  Thu, 17 Apr 2014 22:11:33 +0200
+
+openssl (1.0.1e-2+deb7u6) wheezy-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Enable checking for services that may need to be restarted
+  * Update list of services to possibly restart
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Tue, 08 Apr 2014 10:44:53 +0200
+
+openssl (1.0.1e-2+deb7u5) wheezy-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Add CVE-2014-0160.patch patch.
+    CVE-2014-0160: Fix TLS/DTLS hearbeat information disclosure.
+    A missing bounds check in the handling of the TLS heartbeat extension
+    can be used to reveal up to 64k of memory to a connected client or
+    server.
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Mon, 07 Apr 2014 22:26:55 +0200
+
 openssl (1.0.1e-2+deb7u4) stable; urgency=medium
 
   * enable ec_nistp_64_gcc_128 on *-amd64 (Closes: #698447)

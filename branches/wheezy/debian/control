@@ -11,7 +11,7 @@ Vcs-Svn: svn://svn.debian.org/pkg-openssl/openssl/
 Package: openssl
 Priority: optional
 Architecture: any
-Depends: ${shlibs:Depends}, ${perl:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${perl:Depends}, ${misc:Depends}, libssl1.0.0 (>= 1.0.1e-2+deb7u5)
 Suggests: ca-certificates
 Description: Secure Socket Layer (SSL) binary and related cryptographic tools
  This package contains the openssl binary and related tools.

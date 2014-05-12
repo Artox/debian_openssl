@@ -42,3 +42,7 @@ disable_rdrand.patch
 disable_dual_ec_drbg.patch
 CVE-2013-4353.patch
 dont_change_version.patch
+CVE-2014-0160.patch
+CVE-2010-5298.patch
+CVE-2014-XXXX-Extension-checking-fixes.patch
+CVE-2014-0076.patch
