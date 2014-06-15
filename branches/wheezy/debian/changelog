@@ -1,7 +1,10 @@
 openssl (1.0.1e-2+deb7u11) wheezy-security; urgency=medium
 
-  * Update fix for CVE-2014-0224 to work with more renegiotation
-    and resumption cases. (Closes: #751093)
+  * Update fix for CVE-2014-0224 to work with more renegiotation and
+    resumption cases. (Closes: #751093)
+  * Fix CVE-2012-4929 (CRiME) by disabling zlib compression by default.
+    It can be enabled again by setting the environment variable
+    OPENSSL_NO_DEFAULT_ZLIB.  (Closes: #728055)
 
  -- Kurt Roeckx <kurt@roeckx.be>  Sun, 15 Jun 2014 12:31:21 +0200
 
