@@ -1,0 +1,79 @@
+From 9dbf4e95ef9491329877c628c51bcc8e644c9622 Mon Sep 17 00:00:00 2001
+From: Adam Langley <agl@imperialviolet.org>
+Date: Fri, 6 Jun 2014 14:30:33 -0700
+Subject: [PATCH 04/16] Fix memory leak from zero-length DTLS fragments.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The |pqueue_insert| function can fail if one attempts to insert a
+duplicate sequence number. When handling a fragment of an out of
+sequence message, |dtls1_process_out_of_seq_message| would not call
+|dtls1_reassemble_fragment| if the fragment's length was zero. It would
+then allocate a fresh fragment and attempt to insert it, but ignore the
+return value, leaking the fragment.
+
+This allows an attacker to exhaust the memory of a DTLS peer.
+
+Fixes CVE-2014-3507
+
+Reviewed-by: Matt Caswell <matt@openssl.org>
+Reviewed-by: Emilia Käsper <emilia@openssl.org>
+---
+ ssl/d1_both.c | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
+
+Index: openssl-1.0.1e/ssl/d1_both.c
+===================================================================
+--- openssl-1.0.1e.orig/ssl/d1_both.c	2014-08-06 18:42:03.000000000 +0000
++++ openssl-1.0.1e/ssl/d1_both.c	2014-08-06 18:42:09.111245837 +0000
+@@ -610,6 +610,9 @@
+ 	    msg_hdr->msg_len > dtls1_max_handshake_message_len(s))
+ 		goto err;
+ 
++	if (frag_len == 0)
++		return DTLS1_HM_FRAGMENT_RETRY;
++
+ 	/* Try to find item in queue */
+ 	memset(seq64be,0,sizeof(seq64be));
+ 	seq64be[6] = (unsigned char) (msg_hdr->seq>>8);
+@@ -687,7 +690,12 @@
+ 			i = -1;
+ 			}
+ 
+-		pqueue_insert(s->d1->buffered_messages, item);
++		item = pqueue_insert(s->d1->buffered_messages, item);
++		/* pqueue_insert fails iff a duplicate item is inserted.
++		 * However, |item| cannot be a duplicate. If it were,
++		 * |pqueue_find|, above, would have returned it and control
++		 * would never have reached this branch. */
++		OPENSSL_assert(item != NULL);
+ 		}
+ 
+ 	return DTLS1_HM_FRAGMENT_RETRY;
+@@ -745,7 +753,7 @@
+ 		}
+ 	else
+ 		{
+-		if (frag_len && frag_len < msg_hdr->msg_len)
++		if (frag_len < msg_hdr->msg_len)
+ 			return dtls1_reassemble_fragment(s, msg_hdr, ok);
+ 
+ 		if (frag_len > dtls1_max_handshake_message_len(s))
+@@ -774,7 +782,15 @@
+ 		if ( item == NULL)
+ 			goto err;
+ 
+-		pqueue_insert(s->d1->buffered_messages, item);
++		item = pqueue_insert(s->d1->buffered_messages, item);
++		/* pqueue_insert fails iff a duplicate item is inserted.
++		 * However, |item| cannot be a duplicate. If it were,
++		 * |pqueue_find|, above, would have returned it. Then, either
++		 * |frag_len| != |msg_hdr->msg_len| in which case |item| is set
++		 * to NULL and it will have been processed with
++		 * |dtls1_reassemble_fragment|, above, or the record will have
++		 * been discarded. */
++		OPENSSL_assert(item != NULL);
+ 		}
+ 
+ 	return DTLS1_HM_FRAGMENT_RETRY;

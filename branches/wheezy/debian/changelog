@@ -1,3 +1,17 @@
+openssl (1.0.1e-2+deb7u12) wheezy-security; urgency=medium
+
+  * Fix for CVE-2014-3512
+  * Fix for CVE-2014-3511
+  * Fix for CVE-2014-3510
+  * Fix for CVE-2014-3507
+  * Fix for CVE-2014-3506
+  * Fix for CVE-2014-3505
+  * Fix for CVE-2014-3509
+  * Fix for CVE-2014-5139
+  * Fix for CVE-2014-3508
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Wed, 06 Aug 2014 20:01:34 +0200
+
 openssl (1.0.1e-2+deb7u11) wheezy-security; urgency=medium
 
   * Update fix for CVE-2014-0224 to work with more renegiotation and
