@@ -1,3 +1,12 @@
+openssl (1.0.1e-2+deb7u13) wheezy-security; urgency=medium
+
+  * Fixes CVE-2014-3513
+  * Fixes CVE-2014-3567
+  * Add Fallback SCSV support to mitigate CVE-2014-3566
+  * Fixes CVE-2014-3568
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Wed, 15 Oct 2014 19:45:25 +0200
+
 openssl (1.0.1e-2+deb7u12) wheezy-security; urgency=medium
 
   * Fix for CVE-2014-3512
