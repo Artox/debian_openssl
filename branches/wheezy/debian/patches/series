@@ -72,4 +72,5 @@ Support-TLS_FALLBACK_SCSV.patch
 Fix-for-SRTP-Memory-Leak.patch
 Fix-for-session-tickets-memory-leak.patch
 Fix-no-ssl3-configuration-option.patch
+disable_sslv3.patch
 
