@@ -5,8 +5,10 @@ openssl (1.0.1e-2+deb7u14) wheezy-security; urgency=medium
     It can also be enabled again by setting OPENSSL_ALLOW_SSLv3 in the
     environment to anything.
     This fixes the POODLE issue (CVE-2014-3566).
+  * Fix CVE-2014-3569.  We're not affected by it since we don't build with
+    the no-ssl3 option (yet).
 
- -- Kurt Roeckx <kurt@roeckx.be>  Wed, 31 Dec 2014 13:32:39 +0100
+ -- Kurt Roeckx <kurt@roeckx.be>  Wed, 31 Dec 2014 13:45:07 +0100
 
 openssl (1.0.1e-2+deb7u13) wheezy-security; urgency=medium
 

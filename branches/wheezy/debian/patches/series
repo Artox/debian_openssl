@@ -73,4 +73,4 @@ Fix-for-SRTP-Memory-Leak.patch
 Fix-for-session-tickets-memory-leak.patch
 Fix-no-ssl3-configuration-option.patch
 disable_sslv3.patch
-
+Keep-old-method-in-case-of-an-unsupported-protocol.patch
