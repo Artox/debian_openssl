@@ -16,11 +16,11 @@ Reviewed-by: Matt Caswell <matt@openssl.org>
  ssl/s3_clnt.c | 18 +++++++++++++++---
  2 files changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/ssl/s3_clnt.c b/ssl/s3_clnt.c
-index 7a95d5a..43ffc77 100644
---- a/ssl/s3_clnt.c
-+++ b/ssl/s3_clnt.c
-@@ -1277,6 +1277,8 @@ int ssl3_get_key_exchange(SSL *s)
+Index: openssl-1.0.1e/ssl/s3_clnt.c
+===================================================================
+--- openssl-1.0.1e.orig/ssl/s3_clnt.c	2015-01-08 20:43:25.000000000 +0000
++++ openssl-1.0.1e/ssl/s3_clnt.c	2015-01-08 20:47:39.587041282 +0000
+@@ -1296,6 +1296,8 @@
  	int encoded_pt_len = 0;
  #endif
  
@@ -29,7 +29,7 @@ index 7a95d5a..43ffc77 100644
  	/* use same message size as in ssl3_get_certificate_request()
  	 * as ServerKeyExchange message may be skipped */
  	n=s->method->ssl_get_message(s,
-@@ -1287,14 +1289,26 @@ int ssl3_get_key_exchange(SSL *s)
+@@ -1306,14 +1308,26 @@
  		&ok);
  	if (!ok) return((int)n);
  
@@ -57,16 +57,13 @@ index 7a95d5a..43ffc77 100644
  			{
  			s->session->sess_cert=ssl_sess_cert_new();
  			if (s->ctx->psk_identity_hint)
-@@ -1339,9 +1353,7 @@ int ssl3_get_key_exchange(SSL *s)
- 	/* Total length of the parameters including the length prefix */
- 	param_len=0;
+@@ -1356,9 +1370,7 @@
+ 		}
  
+ 	param_len=0;
 -	alg_k=s->s3->tmp.new_cipher->algorithm_mkey;
  	alg_a=s->s3->tmp.new_cipher->algorithm_auth;
 -	EVP_MD_CTX_init(&md_ctx);
  
- 	al=SSL_AD_DECODE_ERROR;
- 
--- 
-2.1.4
-
+ #ifndef OPENSSL_NO_PSK
+ 	if (alg_k & SSL_kPSK)
