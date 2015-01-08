@@ -1,12 +1,13 @@
 openssl (1.0.1e-2+deb7u14) wheezy-security; urgency=medium
 
-  * Disable SSLv3 by default.  It can be enabled again by calling
-    SSL_CTX_clear_options() or SSL_clear_options() with SSL_OP_NO_SSLv3.
-    It can also be enabled again by setting OPENSSL_ALLOW_SSLv3 in the
-    environment to anything.
-    This fixes the POODLE issue (CVE-2014-3566).
-  * Fix CVE-2014-3569.  We're not affected by it since we don't build with
-    the no-ssl3 option (yet).
+  - Fix for CVE-2014-3571
+  - Fix for CVE-2015-0206
+  - Fix for CVE-2014-3569
+  - Fix for CVE-2014-3572
+  - Fix for CVE-2015-0204
+  - Fix for CVE-2015-0205
+  - Fix for CVE-2014-8275
+  - Fix for CVE-2014-3570
 
  -- Kurt Roeckx <kurt@roeckx.be>  Wed, 31 Dec 2014 13:45:07 +0100
 
