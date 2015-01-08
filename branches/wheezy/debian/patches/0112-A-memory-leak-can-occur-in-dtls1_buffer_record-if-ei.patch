@@ -24,11 +24,11 @@ Reviewed-by: Dr Stephen Henson <steve@openssl.org>
  ssl/d1_pkt.c | 30 +++++++++++++++++++++---------
  1 file changed, 21 insertions(+), 9 deletions(-)
 
-diff --git a/ssl/d1_pkt.c b/ssl/d1_pkt.c
-index 73ce488..0059fe2 100644
---- a/ssl/d1_pkt.c
-+++ b/ssl/d1_pkt.c
-@@ -212,7 +212,7 @@ dtls1_buffer_record(SSL *s, record_pqueue *queue, unsigned char *priority)
+Index: openssl-1.0.1e/ssl/d1_pkt.c
+===================================================================
+--- openssl-1.0.1e.orig/ssl/d1_pkt.c	2015-01-08 20:50:22.000000000 +0000
++++ openssl-1.0.1e/ssl/d1_pkt.c	2015-01-08 20:53:54.679118046 +0000
+@@ -212,7 +212,7 @@
  	/* Limit the size of the queue to prevent DOS attacks */
  	if (pqueue_size(queue->q) >= 100)
  		return 0;
@@ -37,7 +37,20 @@ index 73ce488..0059fe2 100644
  	rdata = OPENSSL_malloc(sizeof(DTLS1_RECORD_DATA));
  	item = pitem_new(priority, rdata);
  	if (rdata == NULL || item == NULL)
-@@ -247,18 +247,22 @@ dtls1_buffer_record(SSL *s, record_pqueue *queue, unsigned char *priority)
+@@ -242,9 +242,11 @@
+ 	/* insert should not fail, since duplicates are dropped */
+ 	if (pqueue_insert(queue->q, item) == NULL)
+ 		{
++		if (rdata->rbuf.buf != NULL)
++			OPENSSL_free(rdata->rbuf.buf);
+ 		OPENSSL_free(rdata);
+ 		pitem_free(item);
+-		return(0);
++		return(-1);
+ 		}
+ 
+ 	s->packet = NULL;
+@@ -255,9 +257,11 @@
  	if (!ssl3_setup_buffers(s))
  		{
  		SSLerr(SSL_F_DTLS1_BUFFER_RECORD, ERR_R_INTERNAL_ERROR);
@@ -48,21 +61,9 @@ index 73ce488..0059fe2 100644
 -		return(0);
 +		return(-1);
  		}
- 
- 	/* insert should not fail, since duplicates are dropped */
- 	if (pqueue_insert(queue->q, item) == NULL)
- 		{
- 		SSLerr(SSL_F_DTLS1_BUFFER_RECORD, ERR_R_INTERNAL_ERROR);
-+		if (rdata->rbuf.buf != NULL)
-+			OPENSSL_free(rdata->rbuf.buf);
- 		OPENSSL_free(rdata);
- 		pitem_free(item);
--		return(0);
-+		return(-1);
- 		}
- 
+ 	
  	return(1);
-@@ -314,8 +318,9 @@ dtls1_process_buffered_records(SSL *s)
+@@ -313,8 +317,9 @@
              dtls1_get_unprocessed_record(s);
              if ( ! dtls1_process_record(s))
                  return(0);
@@ -74,7 +75,7 @@ index 73ce488..0059fe2 100644
              }
          }
  
-@@ -530,7 +535,6 @@ printf("\n");
+@@ -529,7 +534,6 @@
  
  	/* we have pulled in a full packet so zero things */
  	s->packet_length=0;
@@ -82,7 +83,7 @@ index 73ce488..0059fe2 100644
  	return(1);
  
  f_err:
-@@ -563,7 +567,8 @@ int dtls1_get_record(SSL *s)
+@@ -562,7 +566,8 @@
  
  	/* The epoch may have changed.  If so, process all the
  	 * pending records.  This is a non-blocking operation. */
@@ -92,7 +93,7 @@ index 73ce488..0059fe2 100644
  
  	/* if we're renegotiating, then there may be buffered records */
  	if (dtls1_get_processed_record(s))
-@@ -700,7 +705,9 @@ again:
+@@ -699,7 +704,9 @@
  		{
  		if ((SSL_in_init(s) || s->in_handshake) && !s->d1->listen)
  			{
@@ -103,7 +104,7 @@ index 73ce488..0059fe2 100644
  			}
  		rr->length = 0;
  		s->packet_length = 0;
-@@ -713,6 +720,7 @@ again:
+@@ -712,6 +719,7 @@
  		s->packet_length = 0;  /* dump this record */
  		goto again;   /* get another record */
  		}
@@ -111,7 +112,7 @@ index 73ce488..0059fe2 100644
  
  	return(1);
  
-@@ -864,7 +872,11 @@ start:
+@@ -857,7 +865,11 @@
  		 * buffer the application data for later processing rather
  		 * than dropping the connection.
  		 */
@@ -124,6 +125,3 @@ index 73ce488..0059fe2 100644
  		rr->length = 0;
  		goto start;
  		}
--- 
-2.1.4
-
