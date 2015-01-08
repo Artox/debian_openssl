@@ -74,6 +74,7 @@ Fix-for-session-tickets-memory-leak.patch
 Fix-no-ssl3-configuration-option.patch
 #disable_sslv3.patch
 Keep-old-method-in-case-of-an-unsupported-protocol.patch
+0082-Return-error-when-a-bit-string-indicates-an-invalid-.patch
 0094-Fix-various-certificate-fingerprint-issues.patch
 0095-Constify-ASN1_TYPE_cmp-add-X509_ALGOR_cmp.patch
 0098-ECDH-downgrade-bug-fix.patch
