@@ -9,7 +9,7 @@ openssl (1.0.1e-2+deb7u14) wheezy-security; urgency=medium
   - Fix for CVE-2014-8275
   - Fix for CVE-2014-3570
 
- -- Kurt Roeckx <kurt@roeckx.be>  Wed, 31 Dec 2014 13:45:07 +0100
+ -- Kurt Roeckx <kurt@roeckx.be>  Thy, 8 Jan 2015 22:10:07 +0100
 
 openssl (1.0.1e-2+deb7u13) wheezy-security; urgency=medium
 
