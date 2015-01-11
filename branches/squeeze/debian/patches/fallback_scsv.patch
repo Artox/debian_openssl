@@ -1,25 +1,8 @@
-diff --git a/CHANGES b/CHANGES
-index b1739f6..8e9952d 100644
---- a/CHANGES
-+++ b/CHANGES
-@@ -4,6 +4,12 @@
- 
-  Changes between 0.9.8zb and 0.9.8zc [xx XXX xxxx]
- 
-+  *) Add support for TLS_FALLBACK_SCSV.
-+     Client applications doing fallback retries should call
-+     SSL_set_mode(s, SSL_MODE_SEND_FALLBACK_SCSV).
-+     (CVE-2014-3566)
-+     [Adam Langley, Bodo Moeller]
-+
-   *) Add additional DigestInfo checks.
-  
-      Reencode DigestInto in DER and check against the original when
-diff --git a/apps/s_client.c b/apps/s_client.c
-index 54a32ec..74790f4 100644
---- a/apps/s_client.c
-+++ b/apps/s_client.c
-@@ -226,6 +226,7 @@ static void sc_usage(void)
+Index: openssl-0.9.8o/apps/s_client.c
+===================================================================
+--- openssl-0.9.8o.orig/apps/s_client.c	2009-12-16 20:34:19.000000000 +0000
++++ openssl-0.9.8o/apps/s_client.c	2014-11-01 14:28:39.627854119 +0000
+@@ -226,6 +226,7 @@
  	BIO_printf(bio_err," -ssl3         - just use SSLv3\n");
  	BIO_printf(bio_err," -tls1         - just use TLSv1\n");
  	BIO_printf(bio_err," -dtls1        - just use DTLSv1\n");    
@@ -27,7 +10,7 @@ index 54a32ec..74790f4 100644
  	BIO_printf(bio_err," -mtu          - set the link layer MTU\n");
  	BIO_printf(bio_err," -no_tls1/-no_ssl3/-no_ssl2 - turn off that protocol\n");
  	BIO_printf(bio_err," -bugs         - Switch on all SSL implementation bug workarounds\n");
-@@ -339,6 +340,7 @@ int MAIN(int argc, char **argv)
+@@ -339,6 +340,7 @@
  	char *sess_out = NULL;
  	struct sockaddr peer;
  	int peerlen = sizeof(peer);
@@ -35,7 +18,7 @@ index 54a32ec..74790f4 100644
  	int enable_timeouts = 0 ;
  	long socket_mtu = 0;
  #ifndef OPENSSL_NO_JPAKE
-@@ -488,6 +490,10 @@ int MAIN(int argc, char **argv)
+@@ -494,6 +496,10 @@
  			socket_mtu = atol(*(++argv));
  			}
  #endif
@@ -46,7 +29,7 @@ index 54a32ec..74790f4 100644
  		else if (strcmp(*argv,"-bugs") == 0)
  			bugs=1;
  		else if	(strcmp(*argv,"-keyform") == 0)
-@@ -778,6 +784,10 @@ bad:
+@@ -784,6 +790,10 @@
  		SSL_set_session(con, sess);
  		SSL_SESSION_free(sess);
  		}
@@ -57,23 +40,23 @@ index 54a32ec..74790f4 100644
  #ifndef OPENSSL_NO_TLSEXT
  	if (servername != NULL)
  		{
-diff --git a/crypto/err/openssl.ec b/crypto/err/openssl.ec
-index 1a580c5..5fc31ea 100644
---- a/crypto/err/openssl.ec
-+++ b/crypto/err/openssl.ec
-@@ -69,6 +69,7 @@ R SSL_R_TLSV1_ALERT_EXPORT_RESTRICTION		1060
+Index: openssl-0.9.8o/crypto/err/openssl.ec
+===================================================================
+--- openssl-0.9.8o.orig/crypto/err/openssl.ec	2008-10-26 18:42:01.000000000 +0000
++++ openssl-0.9.8o/crypto/err/openssl.ec	2014-11-01 14:28:39.627854119 +0000
+@@ -69,6 +69,7 @@
  R SSL_R_TLSV1_ALERT_PROTOCOL_VERSION		1070
  R SSL_R_TLSV1_ALERT_INSUFFICIENT_SECURITY	1071
  R SSL_R_TLSV1_ALERT_INTERNAL_ERROR		1080
 +R SSL_R_TLSV1_ALERT_INAPPROPRIATE_FALLBACK	1086
  R SSL_R_TLSV1_ALERT_USER_CANCELLED		1090
  R SSL_R_TLSV1_ALERT_NO_RENEGOTIATION		1100
- R SSL_R_TLSV1_UNSUPPORTED_EXTENSION		1110
-diff --git a/doc/apps/s_client.pod b/doc/apps/s_client.pod
-index 96307a9..5736e28 100644
---- a/doc/apps/s_client.pod
-+++ b/doc/apps/s_client.pod
-@@ -50,6 +50,7 @@ B<openssl> B<s_client>
+ 
+Index: openssl-0.9.8o/doc/apps/s_client.pod
+===================================================================
+--- openssl-0.9.8o.orig/doc/apps/s_client.pod	2007-08-23 12:16:03.000000000 +0000
++++ openssl-0.9.8o/doc/apps/s_client.pod	2014-11-01 14:28:39.627854119 +0000
+@@ -34,6 +34,7 @@
  [B<-no_ssl2>]
  [B<-no_ssl3>]
  [B<-no_tls1>]
@@ -81,7 +64,7 @@ index 96307a9..5736e28 100644
  [B<-bugs>]
  [B<-cipher cipherlist>]
  [B<-starttls protocol>]
-@@ -198,10 +199,13 @@ these options disable the use of certain SSL or TLS protocols. By default
+@@ -167,10 +168,13 @@
  the initial handshake uses a method which should be compatible with all
  servers and permit them to use SSL v3, SSL v2 or TLS as appropriate.
  
@@ -98,11 +81,11 @@ index 96307a9..5736e28 100644
  
  =item B<-bugs>
  
-diff --git a/doc/ssl/SSL_CTX_set_mode.pod b/doc/ssl/SSL_CTX_set_mode.pod
-index 9822544..0ee2343 100644
---- a/doc/ssl/SSL_CTX_set_mode.pod
-+++ b/doc/ssl/SSL_CTX_set_mode.pod
-@@ -61,6 +61,12 @@ deal with read/write operations returning without success report. The
+Index: openssl-0.9.8o/doc/ssl/SSL_CTX_set_mode.pod
+===================================================================
+--- openssl-0.9.8o.orig/doc/ssl/SSL_CTX_set_mode.pod	2001-07-11 15:10:28.000000000 +0000
++++ openssl-0.9.8o/doc/ssl/SSL_CTX_set_mode.pod	2014-11-01 14:28:39.627854119 +0000
+@@ -61,6 +61,12 @@
  flag SSL_MODE_AUTO_RETRY will cause read/write operations to only
  return after the handshake and successful completion.
  
@@ -115,11 +98,11 @@ index 9822544..0ee2343 100644
  =back
  
  =head1 RETURN VALUES
-diff --git a/ssl/d1_lib.c b/ssl/d1_lib.c
-index c872cb6..8427798 100644
---- a/ssl/d1_lib.c
-+++ b/ssl/d1_lib.c
-@@ -305,6 +305,16 @@ long dtls1_ctrl(SSL *s, int cmd, long larg, void *parg)
+Index: openssl-0.9.8o/ssl/d1_lib.c
+===================================================================
+--- openssl-0.9.8o.orig/ssl/d1_lib.c	2010-04-06 12:29:08.000000000 +0000
++++ openssl-0.9.8o/ssl/d1_lib.c	2014-11-01 14:28:39.631854035 +0000
+@@ -229,6 +229,16 @@
  	case DTLS_CTRL_LISTEN:
  		ret = dtls1_listen(s, parg);
  		break;
@@ -136,11 +119,11 @@ index c872cb6..8427798 100644
  
  	default:
  		ret = ssl3_ctrl(s, cmd, larg, parg);
-diff --git a/ssl/dtls1.h b/ssl/dtls1.h
-index 697ff6e..a1b1884 100644
---- a/ssl/dtls1.h
-+++ b/ssl/dtls1.h
-@@ -80,6 +80,8 @@ extern "C" {
+Index: openssl-0.9.8o/ssl/dtls1.h
+===================================================================
+--- openssl-0.9.8o.orig/ssl/dtls1.h	2010-04-14 00:17:12.000000000 +0000
++++ openssl-0.9.8o/ssl/dtls1.h	2014-11-01 14:28:39.631854035 +0000
+@@ -80,6 +80,8 @@
  #endif
  
  #define DTLS1_VERSION			0xFEFF
@@ -149,30 +132,16 @@ index 697ff6e..a1b1884 100644
  #define DTLS1_BAD_VER			0x0100
  
  #if 0
-@@ -262,4 +264,3 @@ typedef struct dtls1_record_data_st
+@@ -262,4 +264,3 @@
  }
  #endif
  #endif
 -
-diff --git a/ssl/s23_clnt.c b/ssl/s23_clnt.c
-index 830eff0..910682d 100644
---- a/ssl/s23_clnt.c
-+++ b/ssl/s23_clnt.c
-@@ -559,6 +559,9 @@ static int ssl23_get_server_hello(SSL *s)
- 			goto err;
- 			}
- 
-+		/* ensure that TLS_MAX_VERSION is up-to-date */
-+		OPENSSL_assert(s->version <= TLS_MAX_VERSION);
-+
- 		if (p[0] == SSL3_RT_ALERT && p[5] != SSL3_AL_WARNING)
- 			{
- 			/* fatal alert */
-diff --git a/ssl/s23_srvr.c b/ssl/s23_srvr.c
-index e544853..df08873 100644
---- a/ssl/s23_srvr.c
-+++ b/ssl/s23_srvr.c
-@@ -398,6 +398,9 @@ int ssl23_get_client_hello(SSL *s)
+Index: openssl-0.9.8o/ssl/s23_srvr.c
+===================================================================
+--- openssl-0.9.8o.orig/ssl/s23_srvr.c	2014-11-01 14:28:29.000000000 +0000
++++ openssl-0.9.8o/ssl/s23_srvr.c	2014-11-01 14:28:39.631854035 +0000
+@@ -398,6 +398,9 @@
  		}
  #endif
  
@@ -182,11 +151,11 @@ index e544853..df08873 100644
  	if (s->state == SSL23_ST_SR_CLNT_HELLO_B)
  		{
  		/* we have SSLv3/TLSv1 in an SSLv2 header
-diff --git a/ssl/s2_lib.c b/ssl/s2_lib.c
-index 10751b2..359498c 100644
---- a/ssl/s2_lib.c
-+++ b/ssl/s2_lib.c
-@@ -314,6 +314,8 @@ long ssl2_ctrl(SSL *s, int cmd, long larg, void *parg)
+Index: openssl-0.9.8o/ssl/s2_lib.c
+===================================================================
+--- openssl-0.9.8o.orig/ssl/s2_lib.c	2007-01-21 16:07:25.000000000 +0000
++++ openssl-0.9.8o/ssl/s2_lib.c	2014-11-01 14:28:39.631854035 +0000
+@@ -314,6 +314,8 @@
  	case SSL_CTRL_GET_SESSION_REUSED:
  		ret=s->hit;
  		break;
@@ -195,7 +164,7 @@ index 10751b2..359498c 100644
  	default:
  		break;
  		}
-@@ -362,7 +364,7 @@ int ssl2_put_cipher_by_char(const SSL_CIPHER *c, unsigned char *p)
+@@ -362,7 +364,7 @@
  	if (p != NULL)
  		{
  		l=c->id;
@@ -204,24 +173,23 @@ index 10751b2..359498c 100644
  		p[0]=((unsigned char)(l>>16L))&0xFF;
  		p[1]=((unsigned char)(l>> 8L))&0xFF;
  		p[2]=((unsigned char)(l     ))&0xFF;
-diff --git a/ssl/s3_enc.c b/ssl/s3_enc.c
-index 736bfac..f4391ec 100644
---- a/ssl/s3_enc.c
-+++ b/ssl/s3_enc.c
-@@ -764,7 +764,7 @@ int ssl3_alert_code(int code)
- 	case SSL_AD_BAD_CERTIFICATE_STATUS_RESPONSE: return(SSL3_AD_HANDSHAKE_FAILURE);
- 	case SSL_AD_BAD_CERTIFICATE_HASH_VALUE: return(SSL3_AD_HANDSHAKE_FAILURE);
- 	case SSL_AD_UNKNOWN_PSK_IDENTITY:return(TLS1_AD_UNKNOWN_PSK_IDENTITY);
+Index: openssl-0.9.8o/ssl/s3_enc.c
+===================================================================
+--- openssl-0.9.8o.orig/ssl/s3_enc.c	2014-11-01 14:26:39.000000000 +0000
++++ openssl-0.9.8o/ssl/s3_enc.c	2014-11-01 14:38:37.139329427 +0000
+@@ -759,6 +759,7 @@
+ 	case SSL_AD_INTERNAL_ERROR:	return(SSL3_AD_HANDSHAKE_FAILURE);
+ 	case SSL_AD_USER_CANCELLED:	return(SSL3_AD_HANDSHAKE_FAILURE);
+ 	case SSL_AD_NO_RENEGOTIATION:	return(-1); /* Don't send it :-) */
 +	case SSL_AD_INAPPROPRIATE_FALLBACK:return(TLS1_AD_INAPPROPRIATE_FALLBACK);
  	default:			return(-1);
  		}
  	}
--
-diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index fc723a0..fcdbe47 100644
---- a/ssl/s3_lib.c
-+++ b/ssl/s3_lib.c
-@@ -1986,6 +1986,29 @@ long ssl3_ctrl(SSL *s, int cmd, long larg, void *parg)
+Index: openssl-0.9.8o/ssl/s3_lib.c
+===================================================================
+--- openssl-0.9.8o.orig/ssl/s3_lib.c	2014-11-01 14:26:39.000000000 +0000
++++ openssl-0.9.8o/ssl/s3_lib.c	2014-11-01 14:28:39.631854035 +0000
+@@ -1981,6 +1981,29 @@
  		break;
  
  #endif /* !OPENSSL_NO_TLSEXT */
@@ -251,7 +219,7 @@ index fc723a0..fcdbe47 100644
  	default:
  		break;
  		}
-@@ -2274,6 +2297,7 @@ long ssl3_ctx_callback_ctrl(SSL_CTX *ctx, int cmd, void (*fp)(void))
+@@ -2269,6 +2292,7 @@
  		break;
  
  #endif
@@ -259,11 +227,11 @@ index fc723a0..fcdbe47 100644
  	default:
  		return(0);
  		}
-diff --git a/ssl/ssl.h b/ssl/ssl.h
-index 5f2a04e..6435c59 100644
---- a/ssl/ssl.h
-+++ b/ssl/ssl.h
-@@ -563,6 +563,10 @@ typedef struct ssl_session_st
+Index: openssl-0.9.8o/ssl/ssl.h
+===================================================================
+--- openssl-0.9.8o.orig/ssl/ssl.h	2014-11-01 14:26:39.000000000 +0000
++++ openssl-0.9.8o/ssl/ssl.h	2014-11-01 14:39:17.878475118 +0000
+@@ -560,6 +560,10 @@
  #define SSL_MODE_AUTO_RETRY 0x00000004L
  /* Don't attempt to automatically build certificate chain */
  #define SSL_MODE_NO_AUTO_CHAIN 0x00000008L
@@ -274,15 +242,15 @@ index 5f2a04e..6435c59 100644
  
  
  /* Note: SSL[_CTX]_set_{options,mode} use |= op on the previous value,
-@@ -1209,6 +1213,7 @@ size_t SSL_get_peer_finished(const SSL *s, void *buf, size_t count);
+@@ -1204,6 +1208,7 @@
+ #define SSL_AD_CERTIFICATE_UNOBTAINABLE TLS1_AD_CERTIFICATE_UNOBTAINABLE
+ #define SSL_AD_UNRECOGNIZED_NAME	TLS1_AD_UNRECOGNIZED_NAME
  #define SSL_AD_BAD_CERTIFICATE_STATUS_RESPONSE TLS1_AD_BAD_CERTIFICATE_STATUS_RESPONSE
- #define SSL_AD_BAD_CERTIFICATE_HASH_VALUE TLS1_AD_BAD_CERTIFICATE_HASH_VALUE
- #define SSL_AD_UNKNOWN_PSK_IDENTITY	TLS1_AD_UNKNOWN_PSK_IDENTITY /* fatal */
-+#define SSL_AD_INAPPROPRIATE_FALLBACK	TLS1_AD_INAPPROPRIATE_FALLBACK /* fatal */
++#define SSL_AD_INAPPROPRIATE_FALLBACK  TLS1_AD_INAPPROPRIATE_FALLBACK /* fatal */
  
  #define SSL_ERROR_NONE			0
  #define SSL_ERROR_SSL			1
-@@ -1298,6 +1303,8 @@ size_t SSL_get_peer_finished(const SSL *s, void *buf, size_t count);
+@@ -1293,6 +1298,8 @@
  #define SSL_CTRL_CLEAR_OPTIONS			77
  #define SSL_CTRL_CLEAR_MODE			78
  
@@ -291,7 +259,7 @@ index 5f2a04e..6435c59 100644
  #define DTLSv1_get_timeout(ssl, arg) \
  	SSL_ctrl(ssl,DTLS_CTRL_GET_TIMEOUT,0, (void *)arg)
  #define DTLSv1_handle_timeout(ssl) \
-@@ -1945,6 +1952,7 @@ void ERR_load_SSL_strings(void);
+@@ -1938,6 +1945,7 @@
  #define SSL_R_HTTPS_PROXY_REQUEST			 155
  #define SSL_R_HTTP_REQUEST				 156
  #define SSL_R_ILLEGAL_PADDING				 283
@@ -299,7 +267,7 @@ index 5f2a04e..6435c59 100644
  #define SSL_R_INVALID_CHALLENGE_LENGTH			 158
  #define SSL_R_INVALID_COMMAND				 280
  #define SSL_R_INVALID_PURPOSE				 278
-@@ -2072,6 +2080,7 @@ void ERR_load_SSL_strings(void);
+@@ -2065,6 +2073,7 @@
  #define SSL_R_TLSV1_ALERT_DECRYPTION_FAILED		 1021
  #define SSL_R_TLSV1_ALERT_DECRYPT_ERROR			 1051
  #define SSL_R_TLSV1_ALERT_EXPORT_RESTRICTION		 1060
@@ -307,10 +275,10 @@ index 5f2a04e..6435c59 100644
  #define SSL_R_TLSV1_ALERT_INSUFFICIENT_SECURITY		 1071
  #define SSL_R_TLSV1_ALERT_INTERNAL_ERROR		 1080
  #define SSL_R_TLSV1_ALERT_NO_RENEGOTIATION		 1100
-diff --git a/ssl/ssl3.h b/ssl/ssl3.h
-index de5e559..76f922e 100644
---- a/ssl/ssl3.h
-+++ b/ssl/ssl3.h
+Index: openssl-0.9.8o/ssl/ssl3.h
+===================================================================
+--- openssl-0.9.8o.orig/ssl/ssl3.h	2014-11-01 14:26:39.000000000 +0000
++++ openssl-0.9.8o/ssl/ssl3.h	2014-11-01 14:28:39.699852606 +0000
 @@ -129,9 +129,14 @@
  extern "C" {
  #endif
@@ -327,11 +295,11 @@ index de5e559..76f922e 100644
  #define SSL3_CK_RSA_NULL_MD5			0x03000001
  #define SSL3_CK_RSA_NULL_SHA			0x03000002
  #define SSL3_CK_RSA_RC4_40_MD5 			0x03000003
-diff --git a/ssl/ssl_err.c b/ssl/ssl_err.c
-index 9e28dfd..2896f58 100644
---- a/ssl/ssl_err.c
-+++ b/ssl/ssl_err.c
-@@ -341,6 +341,7 @@ static ERR_STRING_DATA SSL_str_reasons[]=
+Index: openssl-0.9.8o/ssl/ssl_err.c
+===================================================================
+--- openssl-0.9.8o.orig/ssl/ssl_err.c	2014-11-01 14:26:39.000000000 +0000
++++ openssl-0.9.8o/ssl/ssl_err.c	2014-11-01 14:28:39.699852606 +0000
+@@ -339,6 +339,7 @@
  {ERR_REASON(SSL_R_HTTPS_PROXY_REQUEST)   ,"https proxy request"},
  {ERR_REASON(SSL_R_HTTP_REQUEST)          ,"http request"},
  {ERR_REASON(SSL_R_ILLEGAL_PADDING)       ,"illegal padding"},
@@ -339,7 +307,7 @@ index 9e28dfd..2896f58 100644
  {ERR_REASON(SSL_R_INVALID_CHALLENGE_LENGTH),"invalid challenge length"},
  {ERR_REASON(SSL_R_INVALID_COMMAND)       ,"invalid command"},
  {ERR_REASON(SSL_R_INVALID_PURPOSE)       ,"invalid purpose"},
-@@ -468,6 +469,7 @@ static ERR_STRING_DATA SSL_str_reasons[]=
+@@ -466,6 +467,7 @@
  {ERR_REASON(SSL_R_TLSV1_ALERT_DECRYPTION_FAILED),"tlsv1 alert decryption failed"},
  {ERR_REASON(SSL_R_TLSV1_ALERT_DECRYPT_ERROR),"tlsv1 alert decrypt error"},
  {ERR_REASON(SSL_R_TLSV1_ALERT_EXPORT_RESTRICTION),"tlsv1 alert export restriction"},
@@ -347,11 +315,11 @@ index 9e28dfd..2896f58 100644
  {ERR_REASON(SSL_R_TLSV1_ALERT_INSUFFICIENT_SECURITY),"tlsv1 alert insufficient security"},
  {ERR_REASON(SSL_R_TLSV1_ALERT_INTERNAL_ERROR),"tlsv1 alert internal error"},
  {ERR_REASON(SSL_R_TLSV1_ALERT_NO_RENEGOTIATION),"tlsv1 alert no renegotiation"},
-diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index 47a0c7c..5db0b52 100644
---- a/ssl/ssl_lib.c
-+++ b/ssl/ssl_lib.c
-@@ -1296,6 +1296,8 @@ int ssl_cipher_list_to_bytes(SSL *s,STACK_OF(SSL_CIPHER) *sk,unsigned char *p,
+Index: openssl-0.9.8o/ssl/ssl_lib.c
+===================================================================
+--- openssl-0.9.8o.orig/ssl/ssl_lib.c	2010-02-17 19:43:08.000000000 +0000
++++ openssl-0.9.8o/ssl/ssl_lib.c	2014-11-01 14:28:39.703852521 +0000
+@@ -1287,6 +1287,8 @@
  
  	if (sk == NULL) return(0);
  	q=p;
@@ -360,7 +328,7 @@ index 47a0c7c..5db0b52 100644
  
  	for (i=0; i<sk_SSL_CIPHER_num(sk); i++)
  		{
-@@ -1305,24 +1307,36 @@ int ssl_cipher_list_to_bytes(SSL *s,STACK_OF(SSL_CIPHER) *sk,unsigned char *p,
+@@ -1296,24 +1298,36 @@
                      continue;
  #endif /* OPENSSL_NO_KRB5 */                    
  
@@ -409,7 +377,7 @@ index 47a0c7c..5db0b52 100644
  
  	return(p-q);
  	}
-@@ -1333,11 +1347,12 @@ STACK_OF(SSL_CIPHER) *ssl_bytes_to_cipher_list(SSL *s,unsigned char *p,int num,
+@@ -1324,11 +1338,12 @@
  	SSL_CIPHER *c;
  	STACK_OF(SSL_CIPHER) *sk;
  	int i,n;
@@ -423,7 +391,7 @@ index 47a0c7c..5db0b52 100644
  		{
  		SSLerr(SSL_F_SSL_BYTES_TO_CIPHER_LIST,SSL_R_ERROR_IN_RECEIVED_CIPHER_LIST);
  		return(NULL);
-@@ -1352,7 +1367,7 @@ STACK_OF(SSL_CIPHER) *ssl_bytes_to_cipher_list(SSL *s,unsigned char *p,int num,
+@@ -1343,7 +1358,7 @@
  
  	for (i=0; i<num; i+=n)
  		{
@@ -432,7 +400,7 @@ index 47a0c7c..5db0b52 100644
  		if (s->s3 && (n != 3 || !p[0]) &&
  			(p[n-2] == ((SSL3_CK_SCSV >> 8) & 0xff)) &&
  			(p[n-1] == (SSL3_CK_SCSV & 0xff)))
-@@ -1372,6 +1387,23 @@ STACK_OF(SSL_CIPHER) *ssl_bytes_to_cipher_list(SSL *s,unsigned char *p,int num,
+@@ -1363,6 +1378,24 @@
  			continue;
  			}
  
@@ -450,65 +418,43 @@ index 47a0c7c..5db0b52 100644
 +					ssl3_send_alert(s,SSL3_AL_FATAL,SSL_AD_INAPPROPRIATE_FALLBACK);
 +				goto err;
 +				}
++			p += n;
 +			continue;
 +			}
 +
  		c=ssl_get_cipher_by_char(s,p);
  		p+=n;
  		if (c != NULL)
-diff --git a/ssl/t1_enc.c b/ssl/t1_enc.c
-index eb4acef..4b9383a 100644
---- a/ssl/t1_enc.c
-+++ b/ssl/t1_enc.c
-@@ -855,6 +855,7 @@ int tls1_alert_code(int code)
- 	case SSL_AD_BAD_CERTIFICATE_STATUS_RESPONSE: return(TLS1_AD_BAD_CERTIFICATE_STATUS_RESPONSE);
- 	case SSL_AD_BAD_CERTIFICATE_HASH_VALUE: return(TLS1_AD_BAD_CERTIFICATE_HASH_VALUE);
- 	case SSL_AD_UNKNOWN_PSK_IDENTITY:return(TLS1_AD_UNKNOWN_PSK_IDENTITY);
+Index: openssl-0.9.8o/ssl/t1_enc.c
+===================================================================
+--- openssl-0.9.8o.orig/ssl/t1_enc.c	2014-11-01 14:26:39.000000000 +0000
++++ openssl-0.9.8o/ssl/t1_enc.c	2014-11-01 14:30:04.010080084 +0000
+@@ -855,6 +855,7 @@
+ 	case SSL_AD_INTERNAL_ERROR:	return(TLS1_AD_INTERNAL_ERROR);
+ 	case SSL_AD_USER_CANCELLED:	return(TLS1_AD_USER_CANCELLED);
+ 	case SSL_AD_NO_RENEGOTIATION:	return(TLS1_AD_NO_RENEGOTIATION);
 +	case SSL_AD_INAPPROPRIATE_FALLBACK:return(TLS1_AD_INAPPROPRIATE_FALLBACK);
  #ifdef DTLS1_AD_MISSING_HANDSHAKE_MESSAGE
  	case DTLS1_AD_MISSING_HANDSHAKE_MESSAGE: return 
  					  (DTLS1_AD_MISSING_HANDSHAKE_MESSAGE);
-@@ -862,4 +863,3 @@ int tls1_alert_code(int code)
+@@ -862,4 +863,3 @@
  	default:			return(-1);
  		}
  	}
 -
-diff --git a/ssl/tls1.h b/ssl/tls1.h
-index 47f25af..d6f5aee 100644
---- a/ssl/tls1.h
-+++ b/ssl/tls1.h
-@@ -80,17 +80,24 @@ extern "C" {
- 
- #define TLS1_ALLOW_EXPERIMENTAL_CIPHERSUITES	0
- 
-+#define TLS1_VERSION			0x0301
-+#define TLS1_1_VERSION			0x0302
- #define TLS1_2_VERSION			0x0303
--#define TLS1_2_VERSION_MAJOR		0x03
--#define TLS1_2_VERSION_MINOR		0x03
-+/* TLS 1.1 and 1.2 are not supported by this version of OpenSSL, so
-+ * TLS_MAX_VERSION indicates TLS 1.0 regardless of the above
-+ * definitions. (s23_clnt.c and s23_srvr.c have an OPENSSL_assert()
-+ * check that would catch the error if TLS_MAX_VERSION was too low.)
-+ */
+Index: openssl-0.9.8o/ssl/tls1.h
+===================================================================
+--- openssl-0.9.8o.orig/ssl/tls1.h	2009-11-08 14:51:54.000000000 +0000
++++ openssl-0.9.8o/ssl/tls1.h	2014-11-01 14:33:54.853244249 +0000
+@@ -83,6 +83,7 @@
+ #define TLS1_VERSION			0x0301
+ #define TLS1_VERSION_MAJOR		0x03
+ #define TLS1_VERSION_MINOR		0x01
 +#define TLS_MAX_VERSION			TLS1_VERSION
-+
-+#define TLS1_VERSION_MAJOR		0x03
-+#define TLS1_VERSION_MINOR		0x01
  
--#define TLS1_1_VERSION			0x0302
- #define TLS1_1_VERSION_MAJOR		0x03
- #define TLS1_1_VERSION_MINOR		0x02
- 
--#define TLS1_VERSION			0x0301
--#define TLS1_VERSION_MAJOR		0x03
--#define TLS1_VERSION_MINOR		0x01
-+#define TLS1_2_VERSION_MAJOR		0x03
-+#define TLS1_2_VERSION_MINOR		0x03
- 
- #define TLS1_get_version(s) \
- 		((s->version >> 8) == TLS1_VERSION_MAJOR ? s->version : 0)
-@@ -108,6 +115,7 @@ extern "C" {
+ #define TLS1_AD_DECRYPTION_FAILED	21
+ #define TLS1_AD_RECORD_OVERFLOW		22
+@@ -94,6 +95,7 @@
  #define TLS1_AD_PROTOCOL_VERSION	70	/* fatal */
  #define TLS1_AD_INSUFFICIENT_SECURITY	71	/* fatal */
  #define TLS1_AD_INTERNAL_ERROR		80	/* fatal */
@@ -516,22 +462,10 @@ index 47f25af..d6f5aee 100644
  #define TLS1_AD_USER_CANCELLED		90
  #define TLS1_AD_NO_RENEGOTIATION	100
  /* codes 110-114 are from RFC3546 */
-@@ -419,6 +427,3 @@ SSL_CTX_callback_ctrl(ssl,SSL_CTRL_SET_TLSEXT_TICKET_KEY_CB,(void (*)(void))cb)
+@@ -405,6 +407,3 @@
  }
  #endif
  #endif
 -
 -
 -
-diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index 5db0b52..542ab5a 100644
---- a/ssl/ssl_lib.c
-+++ b/ssl/ssl_lib.c
-@@ -1401,6 +1401,7 @@ STACK_OF(SSL_CIPHER) *ssl_bytes_to_cipher_list(SSL *s,unsigned char *p,int num,
- 					ssl3_send_alert(s,SSL3_AL_FATAL,SSL_AD_INAPPROPRIATE_FALLBACK);
- 				goto err;
- 				}
-+			p += n;
- 			continue;
- 			}
- 
