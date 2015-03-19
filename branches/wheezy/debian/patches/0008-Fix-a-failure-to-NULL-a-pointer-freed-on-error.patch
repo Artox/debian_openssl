@@ -11,64 +11,63 @@ Reviewed-by: Richard Levitte <levitte@openssl.org>
  crypto/ec/ec_asn1.c  |  7 +++++--
  2 files changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/asn1/x_x509.c b/crypto/asn1/x_x509.c
-index 2644d5f..d51b76e 100644
---- a/crypto/asn1/x_x509.c
-+++ b/crypto/asn1/x_x509.c
-@@ -172,8 +172,14 @@ X509 *d2i_X509_AUX(X509 **a, const unsigned char **pp, long length)
+Index: openssl-1.0.1e/crypto/asn1/x_x509.c
+===================================================================
+--- openssl-1.0.1e.orig/crypto/asn1/x_x509.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/crypto/asn1/x_x509.c	2015-03-19 18:07:02.689136145 +0000
+@@ -170,8 +170,14 @@
  {
-     const unsigned char *q;
-     X509 *ret;
+ 	const unsigned char *q;
+ 	X509 *ret;
 +    int freeret = 0;
 +
-     /* Save start position */
-     q = *pp;
+ 	/* Save start position */
+ 	q = *pp;
 +
 +    if(!a || *a == NULL) {
 +        freeret = 1;
 +    }
-     ret = d2i_X509(a, pp, length);
-     /* If certificate unreadable then forget it */
-     if (!ret)
-@@ -186,7 +192,11 @@ X509 *d2i_X509_AUX(X509 **a, const unsigned char **pp, long length)
-         goto err;
-     return ret;
-  err:
--    X509_free(ret);
+ 	ret = d2i_X509(a, pp, length);
+ 	/* If certificate unreadable then forget it */
+ 	if(!ret) return NULL;
+@@ -181,7 +187,11 @@
+ 	if(!d2i_X509_CERT_AUX(&ret->aux, pp, length)) goto err;
+ 	return ret;
+ 	err:
+-	X509_free(ret);
 +    if(freeret) {
 +        X509_free(ret);
 +        if (a)
 +            *a = NULL;
 +    }
-     return NULL;
+ 	return NULL;
  }
  
-diff --git a/crypto/ec/ec_asn1.c b/crypto/ec/ec_asn1.c
-index 6ff94a3..b4b0e9f 100644
---- a/crypto/ec/ec_asn1.c
-+++ b/crypto/ec/ec_asn1.c
-@@ -1226,16 +1226,19 @@ EC_KEY *d2i_ECParameters(EC_KEY **a, const unsigned char **in, long len)
-             ECerr(EC_F_D2I_ECPARAMETERS, ERR_R_MALLOC_FAILURE);
-             return NULL;
-         }
--        if (a)
--            *a = ret;
-     } else
-         ret = *a;
+Index: openssl-1.0.1e/crypto/ec/ec_asn1.c
+===================================================================
+--- openssl-1.0.1e.orig/crypto/ec/ec_asn1.c	2015-03-19 18:06:21.000000000 +0000
++++ openssl-1.0.1e/crypto/ec/ec_asn1.c	2015-03-19 18:09:11.394282947 +0000
+@@ -1358,8 +1358,6 @@
+ 			ECerr(EC_F_D2I_ECPARAMETERS, ERR_R_MALLOC_FAILURE);
+ 			return NULL;
+ 			}
+-		if (a)
+-			*a = ret;
+ 		}
+ 	else
+ 		ret = *a;
+@@ -1367,9 +1365,14 @@
+ 	if (!d2i_ECPKParameters(&ret->group, in, len))
+ 		{
+ 		ECerr(EC_F_D2I_ECPARAMETERS, ERR_R_EC_LIB);
++                if (a == NULL || *a != ret)
++                     EC_KEY_free(ret);
+ 		return NULL;
+ 		}
  
-     if (!d2i_ECPKParameters(&ret->group, in, len)) {
-         ECerr(EC_F_D2I_ECPARAMETERS, ERR_R_EC_LIB);
-+        if (a == NULL || *a != ret)
-+             EC_KEY_free(ret);
-         return NULL;
-     }
- 
-+    if (a)
-+        *a = ret;
++        if (a)
++            *a = ret;
 +
-     return ret;
- }
+ 	return ret;
+ 	}
  
--- 
-2.1.4
-
