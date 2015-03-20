@@ -8,8 +8,6 @@ openssl (0.9.8o-4squeeze20) squeeze-lts; urgency=medium
   * Fix CVE-2015-0209
   * Fix CVE-2015-0288
   * Remove export ciphers from DEFAULT.
-  * Make DTLS always act as if read_ahead is set.  This fixes a regression
-    introduce by the fix for CVE-2014-3571.  (Closes: #775502)
 
  -- Kurt Roeckx <kurt@roeckx.be>  Fri, 20 Mar 2015 21:18:02 +0100
 
