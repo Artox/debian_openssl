@@ -1,3 +1,15 @@
+openssl (1.0.1e-2+deb7u17) wheezy-security; urgency=medium
+
+  * Fix CVE-2015-1791
+  * Fix CVE-2015-1792
+  * Fix CVE-2015-1789
+  * Fix CVE-2015-1790
+  * Fix CVE-2015-1788
+  * Fix CVE-2015-4000
+  * Fix CVE-2014-8176
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sat, 13 Jun 2015 12:18:30 +0200
+
 openssl (1.0.1e-2+deb7u16) wheezy-security; urgency=medium
 
   * Revert patch 0003-Free-up-passed-ASN.1-structure-if-reused.patch, it
