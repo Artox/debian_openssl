@@ -1,3 +1,25 @@
+openssl (1.0.1e-2+deb7u20) wheezy-security; urgency=medium
+
+  * Fix CVE-2016-0797
+  * Fix CVE-2016-0798
+  * Fix CVE-2016-0799
+  * Fix CVE-2016-0702
+  * Fix CVE-2016-0705
+  * Disable EXPORT and LOW ciphers: The DROWN attack (CVE-2016-0800)
+    makes use of those, and SLOTH attack (CVE-2015-7575) can make use of them
+    too.
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sun, 28 Feb 2016 23:36:32 +0100
+
+openssl (1.0.1e-2+deb7u19) wheezy-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Add CVE-2015-7575.patch patch.
+    CVE-2015-7575: SLOTH: Security Losses from Obsolete and Truncated
+    Transcript Hashes.
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Thu, 07 Jan 2016 21:10:00 +0100
+
 openssl (1.0.1e-2+deb7u18) wheezy-security; urgency=medium
 
   * Fix CVE-2015-3194
