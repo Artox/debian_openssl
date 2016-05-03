@@ -1,3 +1,14 @@
+openssl (1.0.1e-2+deb7u21) wheezy-security; urgency=medium
+
+  * Fix CVE-2016-2105
+  * Fix CVE-2016-2106
+  * Fix CVE-2016-2107
+  * Fix CVE-2016-2108
+  * Fix CVE-2016-2109
+  * Fix CVE-2016-2176
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Tue, 03 May 2016 21:14:34 +0200
+
 openssl (1.0.1e-2+deb7u20) wheezy-security; urgency=medium
 
   * Fix CVE-2016-0797
