@@ -21,3 +21,6 @@ openssl_fix_for_x32.patch
 ppc64el.patch
 Update-S-MIME-certificates.patch
 Fix-name-length-limit-check.patch
+
+0001-cryptodev-Fix-issue-with-signature-generation.patch
+0002-cryptodev-allow-copying-EVP-contexts.patch
